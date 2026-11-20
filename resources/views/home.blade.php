@@ -4,7 +4,7 @@
 
 @section('content')
     <h1>Новости</h1>
-    <p>Данные загружены из JSON через MainController::index.</p>
+    <p>Последние новости.</p>
 
     <div class="news-grid">
         @foreach ($articles as $id => $article)

@@ -4,7 +4,7 @@
 
 @section('content')
     <h1>Авторизация</h1>
-    <p>После входа выдаётся токен Sanctum, дальше можно работать с защищёнными страницами.</p>
+    <p>Войдите или создайте аккаунт</p>
 
     <form class="auth-form" method="POST" action="{{ route('login.store') }}">
         @csrf

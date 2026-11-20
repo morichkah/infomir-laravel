@@ -4,6 +4,7 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MainController::class, 'index'])->name('home');
@@ -33,9 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/moderation/comments', [CommentController::class, 'moderation'])->name('comments.moderation');
     Route::post('/moderation/comments/{comment}/approve', [CommentController::class, 'approve'])->name('comments.approve');
     Route::delete('/moderation/comments/{comment}/reject', [CommentController::class, 'reject'])->name('comments.reject');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 });
 
-Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
+Route::get('/articles/{article}', [ArticleController::class, 'show'])
+    ->name('articles.show')
+    ->middleware('track.view');
 
 Route::get('/about', function () {
     return view('about');

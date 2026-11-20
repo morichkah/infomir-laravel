@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Сайт') — ИнфоМир</title>
     <style>
         :root {
             /* Лавандовая гамма */
-            --bg: #f5f3ff;         /* Очень светлый сиренево-серый фон */
-            --paper: #ffffff;      /* Белые карточки */
-            --ink: #1e1b4b;        /* Темно-фиолетовый текст */
-            --muted: #64748b;      /* Серый текст */
-            --accent: #7c3aed;     /* Глубокий фиолетовый (для меню) */
+            --bg: #f5f3ff;         
+            --paper: #ffffff;      
+            --ink: #1e1b4b;        
+            --muted: #64748b;      
+            --accent: #7c3aed;     
             --accent-hover: #6d28d9;
-            --line: #e2e8f0;       /* Светлые рамки */
+            --line: #e2e8f0;       
             
-            /* Цвета для кнопок форм (из старого дизайна) */
+            /* Цвета для кнопок форм */
             --btn-form: #2f5d50;   
             --btn-form-hover: #24483e;
         }
@@ -32,7 +33,7 @@
         a { color: var(--accent); text-decoration: none; transition: 0.3s; }
         a:hover { color: var(--accent-hover); text-decoration: underline; }
         
-        /* --- Шапка (Логотип по центру) --- */
+        /* Шапка */
         .site-header {
             background: var(--paper);
             border-bottom: 1px solid var(--line);
@@ -103,7 +104,7 @@
         .site-footer { background: var(--paper); border-top: 1px solid var(--line); margin-top: auto; }
         .site-footer .container { padding: 18px 0; color: var(--muted); font-size: .95rem; text-align: center; }
         
-        /* Сетка новостей (стандартная) */
+        /* Сетка новостей */
         .news-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -126,7 +127,7 @@
         .news-body h2 { margin: 8px 0; font-size: 1.2rem; color: var(--ink); }
         .full-image { width: 100%; max-height: 520px; object-fit: cover; border-radius: 12px; margin: 20px 0; }
 
-        /* --- ФОРМЫ ВХОДА И РЕГИСТРАЦИИ (Как в старом дизайне) --- */
+        /* Формы */
         .auth-form { display: grid; gap: 14px; max-width: 420px; margin-top: 20px; }
         .auth-form label { display: grid; gap: 6px; color: var(--ink); font-weight: 600; }
         .auth-form input {
@@ -138,12 +139,11 @@
         }
         .auth-form input:focus { outline: none; border-color: var(--btn-form); }
         
-        /* Кнопки в формах (темно-зеленые, как раньше) */
         .auth-form button {
             margin-top: 8px;
             padding: 12px 14px;
             border: 0;
-            border-radius: 8px; /* Вернули закругление */
+            border-radius: 8px; 
             background: var(--btn-form);
             color: #fff;
             font: inherit;
@@ -155,7 +155,6 @@
         
         .error { color: #ef4444; font-weight: 400; font-size: .9rem; }
         
-        /* Остальные кнопки (CRUD) */
         .btn {
             display: inline-block;
             padding: 10px 20px;
@@ -192,6 +191,7 @@
     </style>
 </head>
 <body>
+    <div id="app"></div>
     <header class="site-header">
         <div class="header-wrapper">
             <div class="nav-left">
@@ -216,10 +216,25 @@
                     
                     @auth
                         <div style="display:flex; align-items:center; gap:10px; margin-left: 15px; border-left: 1px solid var(--line); padding-left: 15px;">
-                            <span style="font-weight: bold; margin-left: 10px; color: var(--accent);">{{ auth()->user()->name }}</span>
+                            
+                            <!-- --- ДОБАВЛЕНО ДЛЯ 12-Й ЛАБЫ (КОЛОКОЛЬЧИК) --- -->
+                            @php
+                                $unreadCount = auth()->user()->unreadNotifications->count();
+                            @endphp
+                            @if($unreadCount > 0)
+                                <a href="{{ route('notifications.index') }}" style="position: relative; margin-right: 5px; text-decoration: none; font-size: 1.2rem;">
+                                    🔔
+                                    <span style="position: absolute; top: -5px; right: -8px; background: #ef4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem;">
+                                        {{ $unreadCount }}
+                                    </span>
+                                </a>
+                            @endif
+                            <!-- -------------------------------------------- -->
+
+                            <span style="font-weight: bold; color: var(--accent);">{{ auth()->user()->name }}</span>
                             <form method="POST" action="{{ route('logout') }}" style="margin:0;">
                                 @csrf
-                                <button type="submit" class="linkish" style="color:var(--muted); margin-left:10px;">Выход</button>
+                                <button type="submit" class="linkish" style="color:var(--muted);">Выход</button>
                             </form>
                         </div>
                     @else

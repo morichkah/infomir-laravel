@@ -8,6 +8,8 @@ use App\Models\Article;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Cache;
 
 class ArticleController extends Controller
 {
@@ -15,7 +17,30 @@ class ArticleController extends Controller
     {
         $this->authorize('viewAny', Article::class);
 
-        $articles = Article::query()->orderByDesc('date')->paginate(6);
+        $page = request('page', 1);
+        $perPage = 6;
+        $articleIds = Cache::remember('articles_ids_page_' . $page, 600, function () use ($page, $perPage) {
+            return Article::query()
+                ->orderByDesc('date')
+                ->skip(($page - 1) * $perPage)
+                ->take($perPage)
+                ->pluck('id')
+                ->toArray();
+        });
+
+        $articlesData = Article::whereIn('id', $articleIds)->orderByDesc('date')->get();
+
+        $total = Cache::remember('articles_total_count', 600, function () {
+            return Article::count();
+        });
+
+        $articles = new \Illuminate\Pagination\LengthAwarePaginator(
+            $articlesData,
+            $total,
+            $perPage,
+            $page,
+            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+        );
 
         return view('articles.index', compact('articles'));
     }
@@ -30,9 +55,9 @@ class ArticleController extends Controller
     public function store(ArticleRequest $request)
     {
         $this->authorize('create', Article::class);
-
+        
         $article = Article::create($request->validated());
-
+        
         $emails = User::query()
             ->whereHas('role', fn ($query) => $query->where('slug', Role::MODERATOR))
             ->pluck('email');
@@ -42,9 +67,18 @@ class ArticleController extends Controller
         }
 
         foreach ($emails->unique()->filter() as $email) {
-            Mail::to($email)->send(new NewArticleMail($article));
+            Mail::to($email)->queue(new NewArticleMail($article));
         }
+        
+        $readers = User::query()
+            ->whereHas('role', fn ($query) => $query->where('slug', Role::READER))
+            ->get();
 
+        Notification::send($readers, new \App\Notifications\NewArticleNotification($article));
+  
+        event(new \App\Events\NewArticleEvent($article));
+
+        Cache::flush();
         return redirect()
             ->route('articles.show', $article)
             ->with('success', 'Статья создана, уведомление отправлено модератору');
@@ -54,7 +88,19 @@ class ArticleController extends Controller
     {
         $this->authorize('view', $article);
 
-        $article->load('comments.user');
+        $cachedData = Cache::rememberForever('article_data_' . $article->id, function () use ($article) {
+            return [
+                'article' => $article->toArray(),
+                'comments' => $article->comments()->with('user')->get()->toArray(),
+            ];
+        });
+        $articleData = new \App\Models\Article($cachedData['article']);
+        $articleData->id = $article->id;
+        $article = $article->setRawAttributes($cachedData['article']);
+        $comments = collect($cachedData['comments'])->map(function($commentData) {
+            return new \App\Models\Comment($commentData);
+        });
+        $article->setRelation('comments', $comments);
 
         return view('articles.show', compact('article'));
     }
@@ -72,6 +118,7 @@ class ArticleController extends Controller
 
         $article->update($request->validated());
 
+        Cache::flush();
         return redirect()
             ->route('articles.show', $article)
             ->with('success', 'Статья обновлена');
@@ -83,6 +130,7 @@ class ArticleController extends Controller
 
         $article->delete();
 
+        Cache::flush();
         return redirect()
             ->route('articles.index')
             ->with('success', 'Статья удалена');

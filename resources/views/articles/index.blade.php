@@ -4,7 +4,7 @@
 
 @section('content')
     <h1>Новости</h1>
-    <p>CRUD + пагинация. Данные из таблицы articles.</p>
+    <p>Все актуальные новости в одном месте.</p>
     @can('create', App\Models\Article::class)
         <p><a class="btn" href="{{ route('articles.create') }}">Добавить статью</a></p>
     @endcan

@@ -4,7 +4,7 @@
 
 @section('content')
     <h1>Контакты</h1>
-    <p>Данные переданы в шаблон массивом через <code>view()</code> и выводятся динамически.</p>
+    <p>Контакты для связи.</p>
 
     <ul class="contacts">
         @foreach ($contacts as $item)
