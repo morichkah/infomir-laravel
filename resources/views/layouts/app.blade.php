@@ -7,7 +7,6 @@
     <title>@yield('title', 'Сайт') — ИнфоМир</title>
     <style>
         :root {
-            /* Лавандовая гамма */
             --bg: #f5f3ff;         
             --paper: #ffffff;      
             --ink: #1e1b4b;        
@@ -16,7 +15,6 @@
             --accent-hover: #6d28d9;
             --line: #e2e8f0;       
             
-            /* Цвета для кнопок форм */
             --btn-form: #2f5d50;   
             --btn-form-hover: #24483e;
         }
@@ -179,9 +177,73 @@
             background: #f3e8ff; border: 1px solid #d8b4fe; color: var(--accent);
             padding: 12px 16px; border-radius: 8px; margin-bottom: 20px;
         }
-        .pagination-wrap { margin-top: 30px; }
-        .pagination-wrap nav, .pagination-wrap ul { display: flex; gap: 8px; flex-wrap: wrap; list-style: none; padding: 0; justify-content: center; }
-        .pagination-wrap a, .pagination-wrap span { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); font-weight: bold; }
+
+        .pagination-wrap {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 15px !important;
+            margin-top: 30px !important;
+            width: 100% !important;
+        }
+
+        .pagination-wrap nav {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+        }
+
+        .pagination-wrap .pagination {
+            display: flex !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            list-style: none !important;
+            flex-wrap: wrap !important;
+        }
+
+        .pagination-wrap .page-item {
+            display: inline-block !important;
+        }
+
+        .pagination-wrap .page-link {
+            display: block !important;
+            padding: 8px 14px !important;
+            border: 1px solid var(--line) !important;
+            border-radius: 8px !important;
+            color: var(--accent) !important;
+            background: #fff !important;
+            text-decoration: none !important;
+            font-weight: bold !important;
+            line-height: 1.2 !important;
+        }
+
+        .pagination-wrap .page-item.active .page-link {
+            background: var(--accent) !important;
+            color: #fff !important;
+            border-color: var(--accent) !important;
+        }
+
+        .pagination-wrap .page-item.disabled .page-link {
+            color: #cbd5e1 !important;
+            border-color: var(--line) !important;
+            cursor: not-allowed !important;
+        }
+
+        .pagination-wrap nav > div:last-child,
+        .pagination-wrap .pagination + div {
+            display: block !important;
+            width: 100% !important;
+            text-align: center !important;
+            margin-top: 10px !important;
+            color: var(--muted) !important;
+            font-size: 0.9rem !important;
+            clear: both !important;
+        }
         
         @media (max-width: 768px) {
             .header-wrapper { flex-direction: column; gap: 16px; }
@@ -217,7 +279,6 @@
                     @auth
                         <div style="display:flex; align-items:center; gap:10px; margin-left: 15px; border-left: 1px solid var(--line); padding-left: 15px;">
                             
-                            <!-- --- ДОБАВЛЕНО ДЛЯ 12-Й ЛАБЫ (КОЛОКОЛЬЧИК) --- -->
                             @php
                                 $unreadCount = auth()->user()->unreadNotifications->count();
                             @endphp
@@ -229,7 +290,7 @@
                                     </span>
                                 </a>
                             @endif
-                            <!-- -------------------------------------------- -->
+                            <!-- -------------------------------- -->
 
                             <span style="font-weight: bold; color: var(--accent);">{{ auth()->user()->name }}</span>
                             <form method="POST" action="{{ route('logout') }}" style="margin:0;">

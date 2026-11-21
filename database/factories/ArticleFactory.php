@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Article;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/** @extends Factory<Article> */
 class ArticleFactory extends Factory
 {
     public function definition(): array
